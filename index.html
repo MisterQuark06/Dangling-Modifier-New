@@ -75,4 +75,1221 @@ body { margin: 0; background: #f4f1ea; font-family: Georgia, serif; color: #111;
 .share-btn {
   display: inline-block; margin-bottom: 14px;
   padding: 7px 14px; background: #8b0000; color: #fff;
-  border: none; text-
+  border: none; text-transform: uppercase; cursor: pointer;
+  font-family: Georgia, serif; font-size: 11px; letter-spacing: 0.5px;
+}
+.share-btn:hover { background: #6a0000; }
+
+/* ── Questions ── */
+.columns { column-count: 2; column-gap: 36px; }
+.card { break-inside: avoid; margin-bottom: 18px; border-bottom: 1px solid #000; padding-bottom: 10px; }
+.card p { margin: 0 0 4px; line-height: 1.6; font-size: 14px; }
+input[type="text"] {
+  width: 100%; margin-top: 5px; padding: 6px;
+  border: 1px solid #000; font-family: Georgia, serif; font-size: 13px;
+}
+input[type="text"]:disabled { background: #f0f0f0; cursor: not-allowed; }
+
+button {
+  margin-top: 10px; padding: 8px 14px; background: #000; color: #fff;
+  border: none; text-transform: uppercase; cursor: pointer;
+  font-family: Georgia, serif; font-size: 12px; letter-spacing: 0.5px;
+}
+button:hover    { background: #333; }
+button:disabled { background: #999; cursor: not-allowed; }
+
+.correct   { background: #e6f6e6 !important; border: 2px solid #2e7d32 !important; }
+.incorrect { background: #fdecea !important; border: 2px solid #c62828 !important; }
+.inline-feedback { margin-top: 4px; font-size: 12px; font-weight: bold; min-height: 16px; }
+
+/* ── Answer panel ── */
+.answer-panel { margin-top: 24px; border-top: 3px solid #000; padding-top: 12px; }
+.answer-panel h3 { margin-top: 0; font-size: 15px; }
+.answer-entry {
+  margin-bottom: 12px; border-bottom: 1px dashed #bbb;
+  padding-bottom: 10px; font-size: 13px; line-height: 1.6;
+}
+.answer-entry .sentence { font-style: italic; margin-bottom: 3px; }
+
+/* ── Result banner ── */
+.result-banner {
+  margin-top: 24px; padding: 20px 22px;
+  border: 4px solid #000; text-align: center; background: #fff;
+}
+.result-banner h2 { margin: 0 0 8px; font-size: 20px; }
+.result-banner p  { margin: 0 0 12px; font-size: 14px; line-height: 1.6; }
+.result-banner.pass { border-color: #2e7d32; }
+.result-banner.fail { border-color: #8b0000; }
+
+/* ── Side panel ── */
+.side-panel {
+  border: 2px solid #000; background: #fff;
+  padding: 14px; font-size: 13px; margin-bottom: 16px;
+}
+.side-panel h4 {
+  margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;
+  border-bottom: 2px solid #000; padding-bottom: 6px;
+}
+.lb-row {
+  display: flex; justify-content: space-between;
+  padding: 5px 0; border-bottom: 1px dashed #ddd; font-size: 13px;
+}
+.lb-row:last-child { border-bottom: none; }
+.lb-rank  { font-weight: bold; color: #8b0000; margin-right: 6px; min-width: 18px; }
+.lb-pts   { font-weight: bold; }
+.lb-you   { font-style: italic; color: #2e7d32; }
+.lb-empty { font-size: 12px; color: #999; }
+
+/* ── Modal ── */
+.modal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.65); display: none;
+  justify-content: center; align-items: center; z-index: 1000;
+}
+.modal.active { display: flex; }
+.modal-content {
+  background: #fff; padding: 30px; text-align: center;
+  max-width: 480px; width: 92%; border: 4px solid #000;
+}
+.modal-content h2 { margin-top: 0; font-size: 21px; }
+.modal-content p  { font-size: 14px; line-height: 1.6; }
+.modal-buttons {
+  margin-top: 14px; display: flex; gap: 10px;
+  justify-content: center; flex-wrap: wrap;
+}
+
+.rapid-badge {
+  display: inline-block; background: #8b0000; color: #fff;
+  font-size: 10px; text-transform: uppercase; padding: 2px 6px;
+  margin-left: 6px; vertical-align: middle; letter-spacing: 1px;
+}
+.hidden { display: none !important; }
+#timerDisplay { transition: color 0.3s; }
+#timerDisplay.urgent { color: #c62828; font-weight: bold; }
+
+@media (max-width: 680px) {
+  .game-shell { flex-direction: column; }
+  .side-col   { width: 100%; }
+  .columns    { column-count: 1; }
+  .paper-name { font-size: 46px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="masthead">
+    <div class="top-meta">
+      <span id="todayDate"></span>
+      <span>Vol I &bull; No. 001</span>
+      <span>Rs 5.00</span>
+    </div>
+    <div class="rule-thin"></div>
+    <div class="paper-name">Dangling Modifier</div>
+    <div class="strapline">The definitive multiplayer editing game</div>
+    <div class="rule-thick"></div>
+    <div class="rules-line">
+      Spot the error — type the wrong word, phrase, or name the error type to score points
+    </div>
+    <div class="rule-thick"></div>
+  </header>
+
+  <!-- ══ ENTRY SCREEN ══ -->
+  <div id="entryScreen">
+    <div class="entry-wrap">
+      <div class="entry-box">
+        <h2>Enter the Newsroom</h2>
+        <input type="text" id="nameInput" placeholder="Your name" maxlength="24" autocomplete="off">
+        <div class="btn-row">
+          <button id="soloBtn">Play Solo</button>
+          <button id="createBtn">Create Room</button>
+        </div>
+        <div style="margin-top:18px;border-top:1px solid #ccc;padding-top:14px;">
+          <p style="margin:0 0 8px;font-size:13px;">Have a room code? Enter it below:</p>
+          <input type="text" id="joinCodeInput" placeholder="e.g. ABCD" maxlength="4"
+            style="max-width:160px;text-align:center;text-transform:uppercase;
+                   letter-spacing:6px;font-size:18px;">
+          <br>
+          <button id="joinBtn">Join Room</button>
+          <div id="roomNotice" class="room-notice hidden"></div>
+        </div>
+      </div>
+
+      <div class="rooms-section">
+        <h3>Open Rooms <span style="font-size:11px;font-weight:normal;color:#888;">(live)</span></h3>
+        <div id="roomsList"><p class="no-rooms">Loading rooms…</p></div>
+      </div>
+
+      <div class="rooms-section" style="margin-top:28px;">
+        <h3>🏆 All-Time Leaderboard</h3>
+        <div id="globalLbEntry"><p class="no-rooms">Loading…</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GAME AREA ══ -->
+  <div id="gameArea" class="hidden">
+    <div class="game-shell">
+
+      <div class="main-col">
+        <div class="game-info">
+          <div>
+            Round: <span id="roundDisplay">1</span>
+            <span id="rapidBadge" class="rapid-badge hidden">Breaking News</span>
+            <span id="roomPill"   class="room-pill   hidden"></span>
+          </div>
+          <div>Time: <span id="timerDisplay">120</span>s</div>
+          <div>Score: <span id="scoreDisplay">0</span></div>
+        </div>
+
+        <div id="shareBtnWrap"></div>
+
+        <div id="questions" class="columns"></div>
+        <button id="submitBtn">Submit Edition</button>
+
+        <div id="answers"      class="answer-panel hidden"></div>
+        <div id="resultBanner" class="hidden"></div>
+      </div>
+
+      <div class="side-col">
+        <div class="side-panel">
+          <h4 id="roomLbTitle">Leaderboard</h4>
+          <div id="roomLbRows"><span class="lb-empty">No scores yet.</span></div>
+        </div>
+        <div class="side-panel">
+          <h4>🏆 All-Time</h4>
+          <div id="globalLbSide"><span class="lb-empty">Loading…</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<div id="modal" class="modal" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <h2 id="modalTitle"></h2>
+    <p  id="modalMessage"></p>
+    <div id="modalButtons" class="modal-buttons"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore,
+  doc, collection, setDoc, getDoc, updateDoc,
+  onSnapshot, serverTimestamp, increment,
+  query, orderBy, limit, where
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCqSL95VVfe4gzmd_HLdUN1cWUAHyPJbGA",
+  authDomain: "dangling-modifier-new.firebaseapp.com",
+  projectId: "dangling-modifier-new",
+  storageBucket: "dangling-modifier-new.firebasestorage.app",
+  messagingSenderId: "818196994726",
+  appId: "1:818196994726:web:1b5374784f5585cda43267",
+  measurementId: "G-33WMHGZWJQ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let playerName       = "";
+let playerId         = crypto.randomUUID();
+let roomId           = "";
+let isSolo           = false;
+
+let round            = 1;
+let score            = 0;
+let timerValue       = 120;
+let timerInterval    = null;
+let currentQuestions = [];
+let usedSentences    = new Set();
+let isRapidRound     = false;
+let roundSubmitted   = false;
+
+let roomLbUnsub    = null;
+let globalLbUnsub  = null;
+let roomsListUnsub = null;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UTILITIES
+// ─────────────────────────────────────────────────────────────────────────────
+document.getElementById("todayDate").textContent = new Date().toDateString();
+
+const pick    = arr => arr[Math.floor(Math.random() * arr.length)];
+const shuffle = arr => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+const genCode = () => Math.random().toString(36).substring(2, 6).toUpperCase();
+
+function timeAgo(date) {
+  const s = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (s < 60)   return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  return `${Math.floor(s / 3600)}h ago`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WITTY LINES
+// ─────────────────────────────────────────────────────────────────────────────
+const congrats = [
+  "Your red pen is mightier than the sword.",
+  "The sub-editors are weeping with joy.",
+  "Even Fowler would approve.",
+  "Clarity: achieved. Chaos: defeated.",
+  "The compositors are setting your name in bold.",
+  "The editor-in-chief just nodded from across the newsroom.",
+  "Oxford comma or not, you nailed it.",
+  "Deadline: met. Dignity: intact.",
+  "The style guide bows in your direction.",
+  "Another edition saved from embarrassment.",
+  "Strunk & White would buy you a drink.",
+  "The corrections column remains empty. For now.",
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SENTENCE FACTORIES
+// ─────────────────────────────────────────────────────────────────────────────
+const sentenceFactories = [
+  () => pick([
+    "The prime minister arrived in Brussels on Tuesday for emergency trade talks.",
+    "Cabinet ministers gathered at Downing Street ahead of the budget announcement.",
+    "Parliament voted narrowly in favour of the revised immigration bill.",
+    "The foreign secretary flew to Washington for bilateral security discussions.",
+    "Opposition leaders called for an independent inquiry into the data breach.",
+    "The chancellor unveiled a package of measures to ease the cost-of-living crisis.",
+    "Lawmakers approved the infrastructure bill after months of contentious debate.",
+    "The home secretary faced questions over the handling of the asylum backlog.",
+    "The prime minister dismissed the allegations as politically motivated.",
+    "Senior officials confirmed the summit would go ahead despite the diplomatic tensions.",
+  ]),
+  () => pick([
+    "The jury delivered its verdict after six days of deliberations.",
+    "A former banker was sentenced to eight years for insider trading.",
+    "The suspect appeared before magistrates and was remanded in custody.",
+    "Prosecutors presented new forensic evidence on the third day of the trial.",
+    "The appeal court overturned the conviction, citing procedural errors.",
+    "A high court judge ruled the search warrant had been unlawfully obtained.",
+    "The defendant entered a not-guilty plea and was granted conditional bail.",
+    "The coroner recorded an open verdict and called for a wider investigation.",
+    "Detectives arrested three men in connection with the warehouse robbery.",
+    "The parole board rejected the application for early release.",
+  ]),
+  () => pick([
+    "The company posted a record quarterly profit, driven by overseas sales.",
+    "Shares in the tech firm fell sharply after the earnings warning was issued.",
+    "The merger between the two retail giants cleared its final regulatory hurdle.",
+    "Analysts revised their growth forecasts following the central bank's statement.",
+    "The airline announced it would cut two thousand jobs by the end of the year.",
+    "A sovereign wealth fund acquired a controlling stake in the infrastructure group.",
+    "The pharmaceutical company received approval for its new cancer treatment.",
+    "The retailer reported a steep decline in footfall across its high-street branches.",
+    "Commodity prices surged after the supply disruption was confirmed.",
+    "The central bank held interest rates steady for the fourth consecutive meeting.",
+  ]),
+  () => pick([
+    "Researchers published findings suggesting a link between air pollution and cognitive decline.",
+    "The space agency confirmed the probe had entered orbit around the distant moon.",
+    "Scientists recorded the highest ocean temperature in forty years of monitoring.",
+    "A team of biologists discovered a previously unknown species in the Amazon basin.",
+    "The climate summit ended with a landmark agreement on emissions reductions.",
+    "Engineers unveiled a prototype battery capable of storing energy for two weeks.",
+    "Glaciologists warned that the ice shelf could collapse within a decade.",
+    "The observatory detected a radio signal of unknown origin from a nearby galaxy.",
+    "A new study linked prolonged screen exposure to disrupted sleep patterns in children.",
+    "The volcanic eruption prompted authorities to evacuate three coastal villages.",
+  ]),
+  () => pick([
+    "The defending champions were knocked out in the quarter-finals on penalties.",
+    "A late goal secured a dramatic victory for the home side in the cup tie.",
+    "The athletics federation suspended the sprinter pending a doping investigation.",
+    "Organisers confirmed the marathon route would pass through the city centre.",
+    "The club announced the signing of a striker for a reported fee of sixty million.",
+    "An injury to the captain forced a tactical reshuffle in the second half.",
+    "The tennis player retired in the third set after aggravating a knee problem.",
+    "The governing body launched a review into the referee's decision.",
+    "A record crowd attended the opening ceremony at the new stadium.",
+    "The cyclist crossed the line more than two minutes ahead of the nearest rival.",
+  ]),
+  () => pick([
+    "The novelist was awarded the prize at a ceremony in Stockholm on Thursday.",
+    "Critics gave the film a mixed reception at its premiere in Cannes.",
+    "The gallery announced it would return the disputed artefacts to their country of origin.",
+    "A sold-out tour saw the band perform to more than two hundred thousand fans.",
+    "The museum unveiled a major retrospective covering six decades of the artist's work.",
+    "The playwright's new production opened to standing ovations in the West End.",
+    "Streaming figures showed the documentary had been watched by forty million households.",
+    "The festival was cancelled for the second year running due to adverse weather forecasts.",
+    "The auction house sold the painting for three times its estimated value.",
+    "A restoration project revealed a previously unknown fresco beneath the chapel ceiling.",
+  ]),
+  () => pick([
+    "The social media platform announced sweeping changes to its content moderation policy.",
+    "Regulators opened a formal investigation into the search engine's advertising practices.",
+    "The software update introduced new privacy controls and addressed several security flaws.",
+    "A cybersecurity firm warned that millions of passwords had been exposed in the breach.",
+    "The electric vehicle maker reported a sharp rise in deliveries in the final quarter.",
+    "Engineers at the laboratory demonstrated a working quantum processor with one thousand qubits.",
+    "The messaging app said it would encrypt all calls and messages by default.",
+    "The start-up secured funding of two hundred million dollars in its latest investment round.",
+    "Regulators fined the platform for failing to remove harmful content within the required timeframe.",
+    "The chipmaker warned of a global shortage that could affect production for eighteen months.",
+  ]),
+  () => pick([
+    "Health officials confirmed the outbreak had been contained to three districts.",
+    "The hospital trust apologised after a review found systemic failings in patient care.",
+    "A clinical trial showed the new drug reduced symptoms in seventy per cent of cases.",
+    "The government pledged an additional two billion pounds for mental health services.",
+    "Surgeons performed the procedure for the first time using a robotic-assisted system.",
+    "Public health authorities urged residents to get booster vaccinations before winter.",
+    "The inquiry found that staffing shortages had contributed to the rise in waiting times.",
+    "A new screening programme was launched to detect the condition in its early stages.",
+    "The regulator approved the vaccine for use in children aged five and above.",
+    "Paramedics responded to more than three thousand emergency calls over the bank holiday weekend.",
+  ]),
+  () => pick([
+    "Aid agencies warned of a worsening humanitarian crisis in the conflict zone.",
+    "The ceasefire agreement was brokered after three days of negotiations in Geneva.",
+    "Thousands of protesters gathered in the capital following the disputed election result.",
+    "The United Nations Security Council held an emergency session on the border dispute.",
+    "Diplomatic ties between the two nations were severed following the expulsion of envoys.",
+    "Rescue teams pulled survivors from the rubble two days after the earthquake struck.",
+    "The international court issued an arrest warrant for the former head of state.",
+    "The relief convoy was halted at the border for the third consecutive day.",
+    "World leaders condemned the attack and called for an immediate investigation.",
+    "The summit concluded without agreement on the proposed framework for debt relief.",
+  ]),
+  () => pick([
+    "University enrolment figures reached a record high for the third consecutive year.",
+    "Teachers voted in favour of industrial action over pay and working conditions.",
+    "The education secretary announced a review of the national curriculum.",
+    "Exam boards said results would be published on the same day as in previous years.",
+    "A new report found that pupils from disadvantaged backgrounds were falling further behind.",
+    "The school was placed in special measures following a critical inspection report.",
+    "Funding cuts forced the college to close its performing arts department.",
+    "The university suspended admissions to the course pending an accreditation review.",
+    "Inspectors praised the school's leadership but raised concerns about attendance rates.",
+    "A pilot scheme offering free breakfast to all primary pupils was extended nationwide.",
+  ]),
+  () => pick([
+    "The temperature is expected to rise between three to five degrees by the end of the decade.",
+    "The talks lasted between four to six hours before an agreement was reached.",
+    "Analysts forecast growth of between two to four per cent over the next quarter.",
+    "The fine was set at between five hundred to one thousand pounds.",
+    "Delegates spent between two to three days reviewing the proposed amendments.",
+    "The project will take between six to nine months to complete, engineers said.",
+    "Ticket prices range between forty to eighty pounds depending on the category.",
+    "Officials said the delay would last between one to three weeks.",
+  ]),
+  () => pick([
+    "The ruling will only affect residents who moved into the area after the deadline.",
+    "The board only approved the proposal because no alternatives were presented.",
+    "The minister only agreed to the deal after consulting senior advisers.",
+    "The committee only released the report after pressure from opposition MPs.",
+    "The company only disclosed the figures when regulators demanded transparency.",
+    "The judge only accepted the evidence after the defence team raised objections.",
+    "The agency only confirmed the breach once the story appeared in the press.",
+  ]),
+  () => pick([
+    "The new policy will effect significant changes to the way claims are processed.",
+    "There were less people at the rally than organisers had anticipated.",
+    "The decision will effect every employee across the organisation.",
+    "Fewer resources were available then in previous years, the report noted.",
+    "The rise in costs will directly effect the most vulnerable households.",
+  ]),
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ERROR TYPES
+// ─────────────────────────────────────────────────────────────────────────────
+const errorTypes = [
+
+  { name:"Subject-Verb Disagreement", minRound:1,
+    inject(s) {
+      const sw = [
+        [/\bconfirmed\b/,"confirm"],[/\barrived\b/,"arrive"],[/\bvoted\b/,"vote"],
+        [/\bannounced\b/,"announce"],[/\bpublished\b/,"publish"],[/\bsecured\b/,"secure"],
+        [/\bwarned\b/,"warn"],[/\bapproved\b/,"approve"],[/\bfound\b/,"find"],
+        [/\bsaid\b/,"say"],[/\bdelivered\b/,"deliver"],[/\bopened\b/,"open"],
+        [/\brecorded\b/,"record"],[/\bpledged\b/,"pledge"],[/\breported\b/,"report"],
+        [/\bissued\b/,"issue"],[/\brejected\b/,"reject"],[/\bsuspended\b/,"suspend"],
+        [/\bdetected\b/,"detect"],[/\bpraised\b/,"praise"],
+      ];
+      for (const [p,r] of sw) if (p.test(s))
+        return { sentence:s.replace(p,r), error:r,
+          explanation:`"${r}" does not agree with the singular subject; the past tense is required here.` };
+      return null;
+    },
+  },
+
+  { name:"Tense Shift", minRound:1,
+    inject(s) {
+      const sw = [
+        [/\bconfirmed\b/,"confirms"],[/\bannounced\b/,"announces"],[/\bvoted\b/,"votes"],
+        [/\barrived\b/,"arrives"],[/\bwarned\b/,"warns"],[/\bpledged\b/,"pledges"],
+        [/\bsecured\b/,"secures"],[/\bdelivered\b/,"delivers"],[/\bopened\b/,"opens"],
+        [/\bsaid\b/,"says"],[/\breported\b/,"reports"],[/\brejected\b/,"rejects"],
+        [/\bsuspended\b/,"suspends"],[/\bpraised\b/,"praises"],[/\bfound\b/,"finds"],
+        [/\bissued\b/,"issues"],
+      ];
+      for (const [p,r] of sw) if (p.test(s))
+        return { sentence:s.replace(p,r), error:r,
+          explanation:`"${r}" shifts the verb into the present tense, breaking the past-tense narrative.` };
+      return null;
+    },
+  },
+
+  { name:"Wrong Preposition", minRound:1,
+    inject(s) {
+      const sw = [
+        { pat:/\bin favour of\b/, rep:"in favor to",
+          tokens:["favor","in favor to"],
+          exp:'"In favor to" is incorrect; the correct phrase is "in favour of".' },
+        { pat:/\bahead of\b/, rep:"ahead from",
+          tokens:["from","ahead from"],
+          exp:'"Ahead from" is incorrect; the correct preposition is "ahead of".' },
+        { pat:/\bin custody\b/, rep:"on custody",
+          tokens:["on custody"],
+          exp:'"On custody" is incorrect; the correct phrase is "in custody".' },
+        { pat:/\bat a ceremony\b/, rep:"in a ceremony",
+          tokens:["in a ceremony"],
+          exp:'"In a ceremony" is incorrect; the correct preposition is "at".' },
+        { pat:/\bon penalties\b/, rep:"by penalties",
+          tokens:["by penalties"],
+          exp:'"By penalties" is incorrect; the standard phrase is "on penalties".' },
+        { pat:/\bin the second half\b/, rep:"on the second half",
+          tokens:["on the second half"],
+          exp:'"On the second half" is incorrect; the correct preposition is "in".' },
+        { pat:/\bby the end of\b/, rep:"until the end from",
+          tokens:["until","from","until the end from"],
+          exp:'"Until the end from" is incorrect; the correct phrase is "by the end of".' },
+        { pat:/\bin connection with\b/, rep:"in connection to",
+          tokens:["connection to","in connection to"],
+          exp:'"In connection to" is incorrect; the correct phrase is "in connection with".' },
+        { pat:/\bat the border\b/, rep:"on the border",
+          tokens:["on the border"],
+          exp:'"On the border" is incorrect; the correct preposition is "at".' },
+        { pat:/\barrived in\b/, rep:"arrived to",
+          tokens:["arrived to"],
+          exp:'"Arrived to" is incorrect; the correct preposition after "arrived" is "in".' },
+        { pat:/\bflew to\b/, rep:"flew towards",
+          tokens:["towards","flew towards"],
+          exp:'"Flew towards" implies direction only; the correct preposition for a destination is "to".' },
+        { pat:/\bin its early stages\b/, rep:"on its early stages",
+          tokens:["on its early stages"],
+          exp:'"On its early stages" is incorrect; the correct preposition is "in".' },
+      ];
+      for (const {pat,rep,tokens,exp} of sw) if (pat.test(s))
+        return { sentence:s.replace(pat,rep), error:rep,
+          alternateTokens:tokens.map(t=>t.toLowerCase()), explanation:exp };
+      return null;
+    },
+  },
+
+  { name:"Missing Article", minRound:1,
+    inject(s) {
+      const m = s.match(/\b(the |a |an )([a-z])/);
+      if (m) {
+        const idx = s.indexOf(m[0]);
+        return { sentence:s.slice(0,idx)+s.slice(idx+m[1].length),
+          error:"missing article",
+          explanation:"A definite or indefinite article is missing before the noun." };
+      }
+      return null;
+    },
+  },
+
+  { name:"Pronoun Agreement", minRound:1,
+    inject(s) {
+      const sw = [[/\bits\b/,"their"],[/\bher\b/,"their"],[/\btheir\b/,"its"],[/\bhis\b/,"their"]];
+      for (const [p,r] of sw) if (p.test(s))
+        return { sentence:s.replace(p,r), error:r,
+          explanation:`"${r}" does not agree in number or gender with its antecedent.` };
+      return null;
+    },
+  },
+
+  { name:"Redundant Phrasing", minRound:1,
+    inject(s) {
+      const sw = [
+        { pat:/\bnew\b/, rep:"new and novel", tokens:["new","novel","new and novel"],
+          exp:'"New and novel" is redundant — both words mean the same thing.' },
+        { pat:/\ba record\b/, rep:"a new record", tokens:["new","a new record","new record"],
+          exp:'"A new record" is redundant — a record is by definition new.' },
+        { pat:/\bfinal\b/, rep:"final and last", tokens:["final","last","final and last"],
+          exp:'"Final and last" is redundant — the words are synonymous here.' },
+        { pat:/\bfirst time\b/, rep:"first time ever", tokens:["ever","first time ever"],
+          exp:'"First time ever" is redundant — "first time" already implies it has not happened before.' },
+        { pat:/\bunanimously\b/, rep:"unanimously by all", tokens:["all","unanimously by all"],
+          exp:'"Unanimously by all" is redundant — "unanimously" already means every member agreed.' },
+        { pat:/\bsharply\b/, rep:"sharply and steeply", tokens:["sharply","steeply","sharply and steeply"],
+          exp:'"Sharply and steeply" is redundant — both adverbs convey the same degree of change.' },
+        { pat:/\bclosed\b/, rep:"closed down", tokens:["down","closed down"],
+          exp:'"Closed down" is redundant — "closed" is sufficient on its own.' },
+      ];
+      for (const {pat,rep,tokens,exp} of sw) if (pat.test(s))
+        return { sentence:s.replace(pat,rep), error:rep,
+          alternateTokens:tokens.map(t=>t.toLowerCase()), explanation:exp };
+      return {
+        sentence:s.replace(/\.$/, ", as previously stated before."),
+        error:"as previously stated before",
+        alternateTokens:["previously","before","stated before","previously stated"],
+        explanation:'"As previously stated before" is doubly redundant — "previously" and "before" carry the same meaning.',
+      };
+    },
+  },
+
+  { name:"Between...To (should be And)", minRound:1,
+    inject(s) {
+      if (!/between .+ to /.test(s)) return null;
+      return { sentence:s, error:"to",
+        alternateTokens:["to","between to","between...to"],
+        explanation:'"Between" must be paired with "and", not "to". The correct form is "between X and Y".' };
+    },
+  },
+
+  { name:"Misplaced Only", minRound:2,
+    inject(s) {
+      if (!/\bonly\b/.test(s)) return null;
+      const stripped = s.replace(/\bonly\s+/, "");
+      const shifted  = "Only " + stripped.charAt(0).toLowerCase() + stripped.slice(1);
+      return { sentence:shifted, error:"only",
+        explanation:'"Only" is misplaced — it should sit immediately before the word or phrase it modifies.' };
+    },
+  },
+
+  { name:"Word Confusion", minRound:2,
+    inject(s) {
+      const sw = [
+        { pat:/\beffect\b/, rep:"affect",
+          exp:'"Effect" is typically a noun; "affect" is the verb needed here.' },
+        { pat:/\bless people\b/, rep:"fewer people",
+          exp:'"Less" is used with uncountable nouns; "fewer" is correct for countable nouns like "people".' },
+        { pat:/\bless residents\b/, rep:"fewer residents",
+          exp:'"Less" is used with uncountable nouns; "fewer" is correct for countable nouns.' },
+        { pat:/\bthen in previous\b/, rep:"than in previous",
+          exp:'"Then" indicates time sequence; "than" is required for comparisons.' },
+      ];
+      for (const {pat,rep,exp} of sw) if (pat.test(s))
+        return { sentence:s, error:rep, explanation:exp };
+      return null;
+    },
+  },
+
+  { name:"Comma Splice", minRound:2,
+    inject(_s) {
+      return pick([
+        { sentence:"The minister denied the allegations, no evidence was presented to contradict her.",
+          error:",", explanation:"A comma splice joins two independent clauses with only a comma. Use a semicolon, a full stop, or a conjunction." },
+        { sentence:"The verdict was delivered on Friday, the defendant showed no reaction in court.",
+          error:",", explanation:"A comma splice joins two independent clauses with only a comma. Use a semicolon, a full stop, or a conjunction." },
+        { sentence:"Shares fell sharply at the open, investors reacted to the overnight news from Asia.",
+          error:",", explanation:"A comma splice joins two independent clauses with only a comma. Use a semicolon, a full stop, or a conjunction." },
+        { sentence:"The summit ended without a deal, negotiators said they would reconvene in the spring.",
+          error:",", explanation:"A comma splice joins two independent clauses with only a comma. Use a semicolon, a full stop, or a conjunction." },
+        { sentence:"The hospital issued a statement, it declined to comment on individual cases.",
+          error:",", explanation:"A comma splice joins two independent clauses with only a comma. Use a semicolon, a full stop, or a conjunction." },
+      ]);
+    },
+  },
+
+  { name:"Dangling Modifier", minRound:2,
+    inject(_s) {
+      return pick([
+        { sentence:"After reviewing the evidence, the verdict was delivered by the jury.",
+          error:"After reviewing the evidence",
+          explanation:"The opening phrase implies the verdict reviewed the evidence, not the jury — a dangling modifier." },
+        { sentence:"Having missed the deadline, the article was rejected by the editor.",
+          error:"Having missed the deadline",
+          explanation:"The phrase dangles because it implies the article missed the deadline, not the journalist." },
+        { sentence:"Walking through the lobby, the announcement was heard by all staff.",
+          error:"Walking through the lobby",
+          explanation:'The participial phrase incorrectly modifies "the announcement" rather than the people walking.' },
+        { sentence:"Exhausted after the summit, the statement was read by the minister.",
+          error:"Exhausted after the summit",
+          explanation:"As written, it is the statement that is exhausted — a dangling modifier." },
+        { sentence:"Hoping for a quick resolution, the talks were abandoned by negotiators.",
+          error:"Hoping for a quick resolution",
+          explanation:"The phrase implies the talks were hoping, not the negotiators — a dangling modifier." },
+        { sentence:"Alarmed by the figures, a press conference was called by the minister.",
+          error:"Alarmed by the figures",
+          explanation:"As written, it is the press conference that is alarmed — the modifier dangles." },
+      ]);
+    },
+  },
+
+  { name:"Passive Voice Misuse", minRound:3,
+    inject(_s) {
+      return pick([
+        { sentence:"The budget was unveiled by the chancellor, and new spending commitments were outlined.",
+          error:"was unveiled by",
+          explanation:"Passive voice obscures agency. Prefer the active: 'The chancellor unveiled the budget and outlined new spending commitments.'" },
+        { sentence:"The decision was made by the board to close the factory, and workers were informed.",
+          error:"was made by",
+          explanation:"Active voice is clearer in news copy: 'The board decided to close the factory and informed workers.'" },
+        { sentence:"The report was released by the committee, and its findings were described as alarming.",
+          error:"was released by",
+          explanation:"Prefer active voice: 'The committee released the report and described its findings as alarming.'" },
+      ]);
+    },
+  },
+
+  { name:"Incorrect Comparative", minRound:3,
+    inject(s) {
+      const sw = [
+        [/\blargest\b/,"most largest"],[/\bsmaller\b/,"more smaller"],
+        [/\bhigher\b/,"more higher"],[/\bworse\b/,"more worse"],
+        [/\bbetter\b/,"more better"],[/\bfurther\b/,"more further"],
+        [/\bgreater\b/,"more greater"],[/\broader\b/,"more broader"],
+        [/\bstronger\b/,"more stronger"],[/\bsteeper\b/,"more steeper"],
+      ];
+      for (const [p,r] of sw) if (p.test(s))
+        return { sentence:s.replace(p,r), error:r,
+          explanation:`"${r}" is a double comparative — grammatically incorrect in standard English.` };
+      return null;
+    },
+  },
+
+  { name:"Factual Anachronism", minRound:3,
+    inject(s) {
+      const sw = [
+        [/\bon Tuesday\b/,"on Tuesday next week"],
+        [/\bon Thursday\b/,"on last Thursday coming"],
+        [/\byesterday\b/,"yesterday tomorrow"],
+        [/\btwo days after\b/,"two days before after"],
+      ];
+      for (const [p,r] of sw) if (p.test(s))
+        return { sentence:s.replace(p,r), error:r,
+          explanation:`"${r}" is a self-contradictory time reference — an anachronism in a news context.` };
+      return null;
+    },
+  },
+
+  { name:"Ambiguous Antecedent", minRound:4,
+    inject(s) {
+      const sw = [
+        [/^The prime minister\b/,"The prime minister told the ambassador he"],
+        [/^The chancellor\b/,"The chancellor briefed the treasurer and he"],
+        [/^The minister\b/,"The minister met the envoy before he"],
+      ];
+      for (const [p,r] of sw) if (p.test(s)) {
+        const m = s.replace(p,r);
+        return { sentence:m.endsWith(".")?m:m+".", error:"he",
+          explanation:'"He" has an ambiguous antecedent — unclear whether it refers to the first or second person named.' };
+      }
+      return null;
+    },
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// QUESTION GENERATION
+// ─────────────────────────────────────────────────────────────────────────────
+const eligibleTypes = r => errorTypes.filter(e => e.minRound <= r);
+
+function buildQuestionSet(roundNum) {
+  const pool  = shuffle(eligibleTypes(roundNum));
+  const types = Array.from({length:5}, (_,i) => pool[i % pool.length]);
+  return types.map(t => generateForType(t, roundNum));
+}
+
+function generateForType(errType, roundNum) {
+  const factories = shuffle([...sentenceFactories]);
+  for (let a = 0; a < 80; a++) {
+    const base   = factories[a % factories.length]();
+    if (usedSentences.has(base)) continue;
+    const result = errType.inject(base);
+    if (!result || usedSentences.has(result.sentence)) continue;
+
+    let display = result.sentence;
+    if (roundNum >= 2 && Math.random() < 0.4)
+      display = display.replace(/\.$/, ", according to officials.");
+    if (roundNum >= 5 && Math.random() < 0.3)
+      display = display.replace(/\.$/, ", sources confirmed.");
+
+    usedSentences.add(base);
+    usedSentences.add(result.sentence);
+    usedSentences.add(display);
+
+    return { sentence:display, error:result.error, type:errType.name,
+             explanation:result.explanation, alternateTokens:result.alternateTokens||null };
+  }
+  return { sentence:"The committee released their findings late on Friday.",
+           error:"their", type:"Pronoun Agreement",
+           explanation:'"Their" does not agree with the singular noun "committee".', alternateTokens:null };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SMART MATCHING
+// ─────────────────────────────────────────────────────────────────────────────
+function smartMatch(userInput, q) {
+  if (!userInput) return false;
+  const u = userInput.toLowerCase().trim();
+  const e = q.error.toLowerCase();
+  const t = q.type.toLowerCase();
+  if (u.includes(e)) return true;
+  if (q.alternateTokens && q.alternateTokens.some(tok => u.includes(tok))) return true;
+  if (u.includes(t))                                                          return true;
+  if (t.includes("article")     && u.includes("article"))                    return true;
+  if (t.includes("agreement")   && u.includes("agreement"))                  return true;
+  if (t.includes("tense")       && u.includes("tense"))                      return true;
+  if (t.includes("redundant")   && (u.includes("redundant")||u.includes("tautology"))) return true;
+  if (t.includes("modifier")    && u.includes("modifier"))                   return true;
+  if (t.includes("pronoun")     && u.includes("pronoun"))                    return true;
+  if (t.includes("preposition") && u.includes("preposition"))                return true;
+  if (t.includes("comparative") && u.includes("comparative"))                return true;
+  if (t.includes("antecedent")  && (u.includes("antecedent")||u.includes("ambiguous"))) return true;
+  if (t.includes("anachronism") && u.includes("anachronism"))                return true;
+  if (t.includes("between")     && (u.includes("between")||u.includes("and"))) return true;
+  if (t.includes("only")        && u.includes("only"))                       return true;
+  if (t.includes("confusion")   && (u.includes("confusion")||u.includes("affect")||
+      u.includes("effect")||u.includes("fewer")||u.includes("less")))        return true;
+  if (t.includes("splice")      && (u.includes("splice")||u.includes("comma"))) return true;
+  if (t.includes("passive")     && u.includes("passive"))                    return true;
+  return false;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ENTRY BUTTON WIRING
+// ─────────────────────────────────────────────────────────────────────────────
+document.getElementById("soloBtn")  .addEventListener("click", startSolo);
+document.getElementById("createBtn").addEventListener("click", doCreateRoom);
+document.getElementById("joinBtn")  .addEventListener("click", doJoinRoom);
+document.getElementById("submitBtn").addEventListener("click", submitRound);
+
+function validateName() {
+  playerName = document.getElementById("nameInput").value.trim();
+  if (!playerName) { alert("Please enter your name first."); return false; }
+  return true;
+}
+
+async function startSolo() {
+  if (!validateName()) return;
+  isSolo = true;
+  roomId = "";
+  enterGameArea();
+  loadRound();
+}
+
+async function doCreateRoom() {
+  if (!validateName()) return;
+  isSolo = false;
+  roomId = genCode();
+
+  history.replaceState(null, "", `?room=${roomId}`);
+
+  await setDoc(doc(db, "rooms", roomId), {
+    creatorName: playerName,
+    createdAt:   serverTimestamp(),
+    playerCount: 1,
+    active:      true,
+  });
+  await setDoc(doc(db, "rooms", roomId, "leaderboard", playerId), {
+    name: playerName, score: 0, round: 0,
+  });
+
+  enterGameArea();
+  showRoomPill();
+  attachRoomLeaderboard();
+  loadRound();
+}
+
+async function doJoinRoom() {
+  if (!validateName()) return;
+  const code = document.getElementById("joinCodeInput").value.trim().toUpperCase();
+  if (!code || code.length !== 4) { alert("Enter a valid 4-letter room code."); return; }
+
+  const snap = await getDoc(doc(db, "rooms", code));
+  if (!snap.exists()) { alert("Room not found. Check the code and try again."); return; }
+
+  isSolo = false;
+  roomId = code;
+
+  await setDoc(doc(db, "rooms", roomId, "leaderboard", playerId), {
+    name: playerName, score: 0, round: 0,
+  });
+  await updateDoc(doc(db, "rooms", roomId), { playerCount: increment(1) });
+
+  enterGameArea();
+  showRoomPill();
+  attachRoomLeaderboard();
+  loadRound();
+}
+
+window.joinFromList = function(code) {
+  document.getElementById("joinCodeInput").value = code;
+  document.querySelector(".entry-box").scrollIntoView({ behavior:"smooth" });
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCREEN TRANSITIONS
+// ─────────────────────────────────────────────────────────────────────────────
+function enterGameArea() {
+  if (roomsListUnsub) { roomsListUnsub(); roomsListUnsub = null; }
+  document.getElementById("entryScreen").classList.add("hidden");
+  document.getElementById("gameArea").classList.remove("hidden");
+}
+
+function showRoomPill() {
+  const pill = document.getElementById("roomPill");
+  pill.textContent = `Room: ${roomId}`;
+  pill.classList.remove("hidden");
+  document.getElementById("roomLbTitle").textContent = `Room ${roomId} — Scores`;
+
+  history.replaceState(null, "", `?room=${roomId}`);
+
+  const wrap = document.getElementById("shareBtnWrap");
+  wrap.innerHTML = "";
+
+  const shareBtn = document.createElement("button");
+  shareBtn.className   = "share-btn";
+  shareBtn.textContent = "📋 Copy Room Link";
+  shareBtn.onclick = () => {
+    const shareUrl = `${location.origin}${location.pathname}?room=${roomId}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      shareBtn.textContent = "✔ Link Copied!";
+      setTimeout(() => { shareBtn.textContent = "📋 Copy Room Link"; }, 2500);
+    }).catch(() => {
+      prompt("Copy this link and share it:", shareUrl);
+    });
+  };
+
+  wrap.appendChild(shareBtn);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FIRESTORE LISTENERS
+// ─────────────────────────────────────────────────────────────────────────────
+function attachRoomLeaderboard() {
+  if (roomLbUnsub) roomLbUnsub();
+  const q = query(
+    collection(db, "rooms", roomId, "leaderboard"),
+    orderBy("score", "desc")
+  );
+  roomLbUnsub = onSnapshot(q, snap => {
+    const rows = snap.docs.map((d, i) => {
+      const p   = d.data();
+      const you = d.id === playerId ? " lb-you" : "";
+      const tag = d.id === playerId ? " (you)"  : "";
+      return `<div class="lb-row">
+        <span><span class="lb-rank">${i+1}.</span>
+        <span class="${you}">${p.name}${tag}</span></span>
+        <span class="lb-pts">${p.score}</span>
+      </div>`;
+    }).join("");
+    document.getElementById("roomLbRows").innerHTML =
+      rows || '<span class="lb-empty">No scores yet.</span>';
+  });
+}
+
+function attachGlobalLeaderboard() {
+  if (globalLbUnsub) globalLbUnsub();
+  const q = query(
+    collection(db, "globalLeaderboard"),
+    orderBy("bestScore", "desc"),
+    limit(10)
+  );
+  globalLbUnsub = onSnapshot(q, snap => {
+    if (snap.empty) {
+      const empty = '<span class="lb-empty">No games recorded yet.</span>';
+      document.getElementById("globalLbEntry").innerHTML = empty;
+      document.getElementById("globalLbSide").innerHTML  = empty;
+      return;
+    }
+    const entryRows = snap.docs.map((d,i) => {
+      const p = d.data();
+      return `<div class="lb-row">
+        <span><span class="lb-rank">${i+1}.</span> ${p.name}</span>
+        <span class="lb-pts">${p.bestScore} pts &bull; ${p.games} game${p.games===1?"":"s"}</span>
+      </div>`;
+    }).join("");
+    const sideRows = snap.docs.map((d,i) => {
+      const p   = d.data();
+      const you = d.id === playerId ? " lb-you" : "";
+      return `<div class="lb-row">
+        <span><span class="lb-rank">${i+1}.</span>
+        <span class="${you}">${p.name}</span></span>
+        <span class="lb-pts">${p.bestScore}</span>
+      </div>`;
+    }).join("");
+    document.getElementById("globalLbEntry").innerHTML = entryRows;
+    document.getElementById("globalLbSide").innerHTML  = sideRows;
+  });
+}
+
+function attachRoomsList() {
+  const q = query(
+    collection(db, "rooms"),
+    where("active", "==", true),
+    orderBy("createdAt", "desc"),
+    limit(20)
+  );
+  roomsListUnsub = onSnapshot(q, snap => {
+    if (snap.empty) {
+      document.getElementById("roomsList").innerHTML =
+        '<p class="no-rooms">No open rooms right now — create one!</p>';
+      return;
+    }
+    document.getElementById("roomsList").innerHTML = snap.docs.map(d => {
+      const r   = d.data();
+      const ago = r.createdAt ? timeAgo(r.createdAt.toDate()) : "";
+      return `<div class="room-row">
+        <span>
+          <strong style="letter-spacing:2px;">${d.id}</strong>
+          <span class="room-meta"> &bull; ${r.creatorName}
+            &bull; ${r.playerCount} player${r.playerCount===1?"":"s"}
+            &bull; ${ago}</span>
+        </span>
+        <button style="margin-top:0;padding:4px 10px;font-size:11px;"
+          onclick="joinFromList('${d.id}')">Join</button>
+      </div>`;
+    }).join("");
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GAME FLOW
+// ─────────────────────────────────────────────────────────────────────────────
+function loadRound() {
+  stopTimer();
+  currentQuestions = [];
+  roundSubmitted   = false;
+  isRapidRound     = (round % 3 === 0);
+
+  document.getElementById("roundDisplay").textContent = round;
+  document.getElementById("rapidBadge").classList.toggle("hidden", !isRapidRound);
+  document.getElementById("questions").innerHTML = "";
+  document.getElementById("answers").classList.add("hidden");
+  document.getElementById("resultBanner").classList.add("hidden");
+  document.getElementById("resultBanner").innerHTML = "";
+  document.getElementById("submitBtn").disabled = false;
+
+  if (isRapidRound) {
+    showModal(
+      "⚡ Breaking News Rapid Round",
+      `Round ${round} is a <strong>Breaking News Rapid Round</strong>.<br><br>
+       You have <strong>90 seconds</strong>. Correct answers score <strong>3 points</strong> each.`,
+      [{ text:"Start", action:() => { closeModal(); startRound(); } }]
+    );
+  } else {
+    startRound();
+  }
+}
+
+function startRound() {
+  timerValue = isRapidRound ? 90 : 120;
+  updateTimerDisplay();
+
+  currentQuestions = buildQuestionSet(round);
+  const qContainer = document.getElementById("questions");
+  qContainer.innerHTML = "";
+  currentQuestions.forEach((q, i) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <p><strong>Q${i+1}.</strong> ${q.sentence}</p>
+      <input type="text" placeholder="Wrong word / phrase / error type" autocomplete="off">
+      <div class="inline-feedback"></div>
+    `;
+    qContainer.appendChild(div);
+  });
+
+  startTimer();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TIMER
+// ─────────────────────────────────────────────────────────────────────────────
+function startTimer() {
+  stopTimer();
+  timerInterval = setInterval(() => {
+    timerValue--;
+    updateTimerDisplay();
+    if (timerValue <= 0) { stopTimer(); if (!roundSubmitted) submitRound(); }
+  }, 1000);
+}
+function stopTimer() {
+  if (timerInterval !== null) { clearInterval(timerInterval); timerInterval = null; }
+}
+function updateTimerDisplay() {
+  const el = document.getElementById("timerDisplay");
+  el.textContent = timerValue;
+  el.classList.toggle("urgent", timerValue <= 20);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUBMIT
+// ─────────────────────────────────────────────────────────────────────────────
+async function submitRound() {
+  if (roundSubmitted) return;
+  roundSubmitted = true;
+  stopTimer();
+
+  document.querySelectorAll(".card input").forEach(i => i.disabled = true);
+  document.getElementById("submitBtn").disabled = true;
+
+  let correct    = 0;
+  let answerHTML = "<h3>Edition Review</h3>";
+
+  document.querySelectorAll(".card").forEach((card, i) => {
+    const input    = card.querySelector("input");
+    const feedback = card.querySelector(".inline-feedback");
+    const q        = currentQuestions[i];
+    const isRight  = smartMatch(input.value, q);
+
+    if (isRight) {
+      correct++;
+      input.classList.add("correct");
+      feedback.textContent = "✔ Correct";
+      feedback.style.color = "#2e7d32";
+    } else {
+      input.classList.add("incorrect");
+      feedback.textContent = "✖ Incorrect";
+      feedback.style.color = "#c62828";
+    }
+
+    const acceptNote = q.alternateTokens
+      ? `<br><em>Accepted: ${q.alternateTokens.join(", ")}</em>` : "";
+    answerHTML += `
+      <div class="answer-entry">
+        <div class="sentence">${q.sentence}</div>
+        <div><strong>Error:</strong> ${q.error}</div>
+        <div><strong>Type:</strong> ${q.type}</div>
+        <div><strong>Explanation:</strong> ${q.explanation}${acceptNote}</div>
+      </div>`;
+  });
+
+  const roundPoints = isRapidRound ? correct * 3 : correct * 2;
+  score += roundPoints;
+  document.getElementById("scoreDisplay").textContent = score;
+
+  document.getElementById("answers").innerHTML = answerHTML;
+  document.getElementById("answers").classList.remove("hidden");
+
+  await persistScore();
+  showResultBanner(correct >= 4, correct);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PERSIST SCORE
+// ─────────────────────────────────────────────────────────────────────────────
+async function persistScore() {
+  if (!isSolo && roomId) {
+    await setDoc(doc(db, "rooms", roomId, "leaderboard", playerId), {
+      name: playerName, score, round,
+    });
+  }
+  const globalRef  = doc(db, "globalLeaderboard", playerId);
+  const globalSnap = await getDoc(globalRef);
+  if (globalSnap.exists()) {
+    await updateDoc(globalRef, {
+      name:      playerName,
+      bestScore: Math.max(globalSnap.data().bestScore || 0, score),
+    });
+  } else {
+    await setDoc(globalRef, { name:playerName, bestScore:score, games:1 });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RESULT BANNER
+// ─────────────────────────────────────────────────────────────────────────────
+function showResultBanner(passed, correct) {
+  const banner = document.getElementById("resultBanner");
+  banner.innerHTML = "";
+  banner.className = `result-banner ${passed ? "pass" : "fail"}`;
+
+  const heading = document.createElement("h2");
+  const body    = document.createElement("p");
+  const hint    = document.createElement("p");
+
+  if (passed) {
+    heading.textContent = "Edition Approved ✓";
+    body.innerHTML      = `You got <strong>${correct}/5</strong> correct.`;
+    hint.textContent    = "Review the explanations above, then continue when ready.";
+  } else {
+    heading.textContent = "Killed by the Subs";
+    body.innerHTML      = `You got <strong>${correct}/5</strong> — you need at least 4 to pass.`;
+    hint.textContent    = "Review the explanations above, then try again.";
+  }
+
+  banner.appendChild(heading);
+  banner.appendChild(body);
+  banner.appendChild(hint);
+
+  const btn = document.createElement("button");
+  if (passed) {
+    btn.textContent = `Continue to Round ${round + 1} →`;
+    btn.onclick = () => {
+      const line = pick(congrats);
+      showModal(
+        "Edition Approved ✓",
+        `<em>${line}</em><br><br>Round ${round + 1} starts now.`,
+        [{ text:"Let's go", action:() => { closeModal(); round++; loadRound(); } }]
+      );
+    };
+  } else {
+    btn.textContent = "Retry This Round";
+    btn.onclick = () => { loadRound(); };
+  }
+
+  banner.appendChild(btn);
+  banner.classList.remove("hidden");
+  banner.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MODAL
+// ─────────────────────────────────────────────────────────────────────────────
+function showModal(title, message, buttons) {
+  document.getElementById("modalTitle").innerHTML   = title;
+  document.getElementById("modalMessage").innerHTML = message;
+  const btnDiv = document.getElementById("modalButtons");
+  btnDiv.innerHTML = "";
+  buttons.forEach(({ text, action }) => {
+    const b = document.createElement("button");
+    b.textContent = text;
+    b.onclick = () => { b.onclick = null; action(); };
+    btnDiv.appendChild(b);
+  });
+  document.getElementById("modal").classList.add("active");
+}
+
+function closeModal() {
+  document.getElementById("modal").classList.remove("active");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+attachGlobalLeaderboard();
+attachRoomsList();
+
+const urlParams   = new URLSearchParams(window.location.search);
+const roomFromUrl = urlParams.get("room");
+
+if (roomFromUrl && roomFromUrl.length === 4) {
+  const code = roomFromUrl.toUpperCase();
+  document.getElementById("joinCodeInput").value = code;
+  const notice = document.getElementById("roomNotice");
+  notice.textContent = `Room ${code} found — enter your name above and click Join Room.`;
+  notice.classList.remove("hidden");
+  document.querySelector(".entry-box").scrollIntoView({ behavior:"smooth" });
+}
+
+</script>
+</body>
+</html>
