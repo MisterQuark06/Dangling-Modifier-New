@@ -47,7 +47,7 @@ body { margin: 0; background: #f4f1ea; font-family: Georgia, serif; color: #111;
 .room-row .room-meta { color: #555; font-size: 12px; }
 .no-rooms { font-size: 13px; color: #888; padding: 10px 0; }
 
-/* ── Room-link notice (shown when arriving via a shared link) ── */
+/* ── Room-link notice ── */
 .room-notice {
   margin-top: 10px; padding: 8px 12px; background: #f0f7f0;
   border: 1px solid #2e7d32; font-size: 13px; color: #2e7d32;
@@ -211,12 +211,6 @@ button:disabled { background: #999; cursor: not-allowed; }
                    letter-spacing:6px;font-size:18px;">
           <br>
           <button id="joinBtn">Join Room</button>
-          <!--
-            CHANGE 3 of 3 (part A):
-            This notice div is hidden by default. When a player arrives via a
-            shared link containing ?room=XXXX, the INIT block at the bottom
-            reveals it and fills in the room code so they know what to do.
-          -->
           <div id="roomNotice" class="room-notice hidden"></div>
         </div>
       </div>
@@ -248,11 +242,6 @@ button:disabled { background: #999; cursor: not-allowed; }
           <div>Score: <span id="scoreDisplay">0</span></div>
         </div>
 
-        <!--
-          CHANGE 2 of 3 (part A):
-          Placeholder div where the copy-link button is injected by showRoomPill().
-          Kept here so it appears above the questions in a natural reading position.
-        -->
         <div id="shareBtnWrap"></div>
 
         <div id="questions" class="columns"></div>
@@ -297,15 +286,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
   apiKey: "AIzaSyCqSL95VVfe4gzmd_HLdUN1cWUAHyPJbGA",
   authDomain: "dangling-modifier-new.firebaseapp.com",
   projectId: "dangling-modifier-new",
@@ -313,11 +293,6 @@ const firebaseConfig = {
   messagingSenderId: "818196994726",
   appId: "1:818196994726:web:1b5374784f5585cda43267",
   measurementId: "G-33WMHGZWJQ"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 };
 
 const app = initializeApp(firebaseConfig);
@@ -909,18 +884,11 @@ async function startSolo() {
   loadRound();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CHANGE 1 OF 3 — doCreateRoom
-// After generating the room code, immediately push it into the browser URL
-// so the address bar becomes a shareable link before the player even starts.
-// history.replaceState updates the URL without triggering a page reload.
-// ─────────────────────────────────────────────────────────────────────────────
 async function doCreateRoom() {
   if (!validateName()) return;
   isSolo = false;
   roomId = genCode();
 
-  // Push room code into the URL straight away so the address bar is shareable
   history.replaceState(null, "", `?room=${roomId}`);
 
   await setDoc(doc(db, "rooms", roomId), {
@@ -975,39 +943,26 @@ function enterGameArea() {
   document.getElementById("gameArea").classList.remove("hidden");
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CHANGE 2 OF 3 — showRoomPill
-// Extended to also: update the URL with the room code (covers the join path
-// where doCreateRoom didn't run), and inject a "Copy Room Link" button into
-// #shareBtnWrap so the room creator can share with one click.
-// The button uses the Clipboard API and gives brief visual confirmation.
-// ─────────────────────────────────────────────────────────────────────────────
 function showRoomPill() {
-  // Label the room pill in the game info bar
   const pill = document.getElementById("roomPill");
   pill.textContent = `Room: ${roomId}`;
   pill.classList.remove("hidden");
   document.getElementById("roomLbTitle").textContent = `Room ${roomId} — Scores`;
 
-  // Ensure the URL always reflects the active room (covers the join path too)
   history.replaceState(null, "", `?room=${roomId}`);
 
-  // Inject the copy-link button above the question grid
   const wrap = document.getElementById("shareBtnWrap");
-  wrap.innerHTML = ""; // clear any previous button if room changes
+  wrap.innerHTML = "";
 
   const shareBtn = document.createElement("button");
   shareBtn.className   = "share-btn";
   shareBtn.textContent = "📋 Copy Room Link";
   shareBtn.onclick = () => {
-    // Build the full absolute URL including the room code parameter
     const shareUrl = `${location.origin}${location.pathname}?room=${roomId}`;
     navigator.clipboard.writeText(shareUrl).then(() => {
-      // Brief confirmation — reverts after 2.5 seconds
       shareBtn.textContent = "✔ Link Copied!";
       setTimeout(() => { shareBtn.textContent = "📋 Copy Room Link"; }, 2500);
     }).catch(() => {
-      // Fallback for browsers that block clipboard without HTTPS
       prompt("Copy this link and share it:", shareUrl);
     });
   };
@@ -1318,10 +1273,7 @@ function closeModal() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CHANGE 3 OF 3 — INIT
-// On page load, check whether the URL contains ?room=XXXX.
-// If it does, pre-fill the join code input and show a green notice
-// so the arriving player immediately knows what to do.
+// INIT
 // ─────────────────────────────────────────────────────────────────────────────
 attachGlobalLeaderboard();
 attachRoomsList();
@@ -1331,16 +1283,10 @@ const roomFromUrl = urlParams.get("room");
 
 if (roomFromUrl && roomFromUrl.length === 4) {
   const code = roomFromUrl.toUpperCase();
-
-  // Pre-fill the join code input
   document.getElementById("joinCodeInput").value = code;
-
-  // Show the green notice beneath the join field
   const notice = document.getElementById("roomNotice");
   notice.textContent = `Room ${code} found — enter your name above and click Join Room.`;
   notice.classList.remove("hidden");
-
-  // Scroll the entry box into view in case the leaderboard pushes it down
   document.querySelector(".entry-box").scrollIntoView({ behavior:"smooth" });
 }
 
