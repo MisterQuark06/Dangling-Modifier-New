@@ -796,23 +796,30 @@ const errorTypes = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// QUESTION GENERATION
+// QUESTION GENERATION  ← FIXED
 // ─────────────────────────────────────────────────────────────────────────────
 const eligibleTypes = r => errorTypes.filter(e => e.minRound <= r);
 
 function buildQuestionSet(roundNum) {
-  const pool  = shuffle(eligibleTypes(roundNum));
-  const types = Array.from({length:5}, (_,i) => pool[i % pool.length]);
-  return types.map(t => generateForType(t, roundNum));
+  const pool   = shuffle(eligibleTypes(roundNum));
+  const used   = new Set();
+  const result = [];
+
+  for (let attempt = 0; result.length < 5 && attempt < 200; attempt++) {
+    const t = pool[attempt % pool.length];
+    if (used.has(t.name)) continue;
+    const q = generateForType(t, roundNum);
+    if (q) { used.add(t.name); result.push(q); }
+  }
+  return result;
 }
 
 function generateForType(errType, roundNum) {
   const factories = shuffle([...sentenceFactories]);
-  for (let a = 0; a < 80; a++) {
+  for (let a = 0; a < 200; a++) {
     const base   = factories[a % factories.length]();
-    if (usedSentences.has(base)) continue;
     const result = errType.inject(base);
-    if (!result || usedSentences.has(result.sentence)) continue;
+    if (!result) continue;
 
     let display = result.sentence;
     if (roundNum >= 2 && Math.random() < 0.4)
@@ -820,45 +827,72 @@ function generateForType(errType, roundNum) {
     if (roundNum >= 5 && Math.random() < 0.3)
       display = display.replace(/\.$/, ", sources confirmed.");
 
-    usedSentences.add(base);
-    usedSentences.add(result.sentence);
-    usedSentences.add(display);
+    const key = display + "||" + result.error;
+    if (usedSentences.has(key)) continue;
+
+    usedSentences.add(key);
 
     return { sentence:display, error:result.error, type:errType.name,
              explanation:result.explanation, alternateTokens:result.alternateTokens||null };
   }
-  return { sentence:"The committee released their findings late on Friday.",
-           error:"their", type:"Pronoun Agreement",
-           explanation:'"Their" does not agree with the singular noun "committee".', alternateTokens:null };
+
+  // Varied fallbacks so the same sentence never repeats
+  const fallbacks = [
+    { sentence:"The committee released their findings late on Friday.", error:"their", type:"Pronoun Agreement",
+      explanation:'"Their" does not agree with the singular noun "committee".', alternateTokens:null },
+    { sentence:"The jury delivered their verdict after three days.", error:"their", type:"Pronoun Agreement",
+      explanation:'"Their" does not agree with the singular noun "jury".', alternateTokens:null },
+    { sentence:"The board made their decision behind closed doors.", error:"their", type:"Pronoun Agreement",
+      explanation:'"Their" does not agree with the singular noun "board".', alternateTokens:null },
+    { sentence:"The panel released their report without comment.", error:"their", type:"Pronoun Agreement",
+      explanation:'"Their" does not agree with the singular noun "panel".', alternateTokens:null },
+    { sentence:"The government announced their plans for the new term.", error:"their", type:"Pronoun Agreement",
+      explanation:'"Their" does not agree with the singular noun "government".', alternateTokens:null },
+  ];
+  for (const f of fallbacks) {
+    const key = f.sentence + "||" + f.error;
+    if (!usedSentences.has(key)) { usedSentences.add(key); return f; }
+  }
+  return fallbacks[Math.floor(Math.random() * fallbacks.length)];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SMART MATCHING
+// SMART MATCHING  ← FIXED
 // ─────────────────────────────────────────────────────────────────────────────
 function smartMatch(userInput, q) {
   if (!userInput) return false;
   const u = userInput.toLowerCase().trim();
   const e = q.error.toLowerCase();
   const t = q.type.toLowerCase();
-  if (u.includes(e)) return true;
-  if (q.alternateTokens && q.alternateTokens.some(tok => u.includes(tok))) return true;
-  if (u.includes(t))                                                          return true;
-  if (t.includes("article")     && u.includes("article"))                    return true;
-  if (t.includes("agreement")   && u.includes("agreement"))                  return true;
-  if (t.includes("tense")       && u.includes("tense"))                      return true;
-  if (t.includes("redundant")   && (u.includes("redundant")||u.includes("tautology"))) return true;
-  if (t.includes("modifier")    && u.includes("modifier"))                   return true;
-  if (t.includes("pronoun")     && u.includes("pronoun"))                    return true;
-  if (t.includes("preposition") && u.includes("preposition"))                return true;
-  if (t.includes("comparative") && u.includes("comparative"))                return true;
-  if (t.includes("antecedent")  && (u.includes("antecedent")||u.includes("ambiguous"))) return true;
-  if (t.includes("anachronism") && u.includes("anachronism"))                return true;
-  if (t.includes("between")     && (u.includes("between")||u.includes("and"))) return true;
-  if (t.includes("only")        && u.includes("only"))                       return true;
+
+  // Accept if any meaningful word from the error appears in the user's answer
+  const errorWords = e.split(/\s+/).filter(w => w.length > 2);
+  if (errorWords.some(w => u.includes(w))) return true;
+
+  if (q.alternateTokens) {
+    for (const tok of q.alternateTokens) {
+      const tokWords = tok.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+      if (tokWords.some(w => u.includes(w))) return true;
+    }
+  }
+
+  if (u.includes(t))                                                                      return true;
+  if (t.includes("article")     && u.includes("article"))                                 return true;
+  if (t.includes("agreement")   && u.includes("agreement"))                               return true;
+  if (t.includes("tense")       && u.includes("tense"))                                   return true;
+  if (t.includes("redundant")   && (u.includes("redundant")||u.includes("tautology")))    return true;
+  if (t.includes("modifier")    && u.includes("modifier"))                                return true;
+  if (t.includes("pronoun")     && u.includes("pronoun"))                                 return true;
+  if (t.includes("preposition") && u.includes("preposition"))                             return true;
+  if (t.includes("comparative") && u.includes("comparative"))                             return true;
+  if (t.includes("antecedent")  && (u.includes("antecedent")||u.includes("ambiguous")))   return true;
+  if (t.includes("anachronism") && u.includes("anachronism"))                             return true;
+  if (t.includes("between")     && (u.includes("between")||u.includes("and")))            return true;
+  if (t.includes("only")        && u.includes("only"))                                    return true;
   if (t.includes("confusion")   && (u.includes("confusion")||u.includes("affect")||
-      u.includes("effect")||u.includes("fewer")||u.includes("less")))        return true;
-  if (t.includes("splice")      && (u.includes("splice")||u.includes("comma"))) return true;
-  if (t.includes("passive")     && u.includes("passive"))                    return true;
+      u.includes("effect")||u.includes("fewer")||u.includes("less")))                     return true;
+  if (t.includes("splice")      && (u.includes("splice")||u.includes("comma")))           return true;
+  if (t.includes("passive")     && u.includes("passive"))                                 return true;
   return false;
 }
 
